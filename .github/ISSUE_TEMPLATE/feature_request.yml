@@ -1,0 +1,20 @@
+name: Feature / adapter request
+description: Propose a payment-platform adapter or improvement
+body:
+  - type: input
+    id: platform
+    attributes: {label: Platform / integration}
+    validations: {required: true}
+  - type: textarea
+    id: usecase
+    attributes: {label: Payment lifecycle / use case}
+    validations: {required: true}
+  - type: textarea
+    id: docs
+    attributes: {label: Official provider/platform API documentation}
+  - type: textarea
+    id: recurring
+    attributes: {label: If recurring is requested, describe the real renewal/mandate API lifecycle}
+  - type: markdown
+    attributes:
+      value: "A one-time payment link is not sufficient evidence for automatic subscription support."

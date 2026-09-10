@@ -1,0 +1,33 @@
+name: CI
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['7.4', '8.1', '8.3']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+      - name: PHP syntax
+        run: find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
+      - name: Smoke
+        run: php tests/smoke.php
+      - name: Secret pattern scan
+        run: |
+          ! grep -RInE --exclude-dir=.git --exclude-dir=dist --exclude='*.md' --exclude='readme.txt' '(sk_live_[A-Za-z0-9_-]{12,}|sk_test_[A-Za-z0-9_-]{12,}|access_token.{0,8}[A-Za-z0-9_-]{32,}|BEGIN (RSA )?PRIVATE KEY)' .
+  javascript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check assets/js/wc-blocks.js
+      - run: node --check assets/js/surecart.js

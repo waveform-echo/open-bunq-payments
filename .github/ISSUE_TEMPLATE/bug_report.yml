@@ -1,0 +1,25 @@
+name: Bug report
+description: Report a reproducible non-security bug
+body:
+  - type: markdown
+    attributes:
+      value: "Do not post secrets, bank data or security vulnerabilities here."
+  - type: input
+    id: version
+    attributes: {label: Plugin version}
+    validations: {required: true}
+  - type: input
+    id: stack
+    attributes: {label: WordPress / PHP / commerce platform versions}
+    validations: {required: true}
+  - type: textarea
+    id: steps
+    attributes: {label: Reproduction steps}
+    validations: {required: true}
+  - type: textarea
+    id: expected
+    attributes: {label: Expected vs actual behavior}
+    validations: {required: true}
+  - type: textarea
+    id: sanitized
+    attributes: {label: Sanitized logs (no secrets/personal/bank data)}

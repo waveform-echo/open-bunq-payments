@@ -1,0 +1,9 @@
+.github
+.gitignore
+.gitattributes
+.distignore
+composer.json
+phpcs.xml.dist
+tests
+tools
+SOURCE_MANIFEST.sha256
