@@ -10,6 +10,7 @@ Contributions are welcome.
 4. Recurring support must have a real recurring provider contract; never emulate it with one-time payments.
 5. New external services must be disclosed in documentation.
 6. Never include real credentials, customer data or production payloads in tests/issues.
+7. Public commit metadata must use the contributor's GitHub-generated noreply identity when email privacy is enabled; never publish a personal mailbox address by accident.
 
 ## Development
 
@@ -18,7 +19,13 @@ find . -name '*.php' -print0 | xargs -0 -n1 php -l
 node --check assets/js/wc-blocks.js
 node --check assets/js/surecart.js
 php tests/smoke.php
+python3 tools/secret_scan.py --self-test
+python3 tools/secret_scan.py --tree .
+bash tools/update_manifest.sh
+sha256sum -c SOURCE_MANIFEST.sha256
 ```
+
+Run the manifest update after source/documentation/workflow changes and include the updated `SOURCE_MANIFEST.sha256` in the same commit.
 
 Open a pull request with:
 - problem/goal;

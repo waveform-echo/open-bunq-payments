@@ -22,3 +22,9 @@ Until a dedicated security contact exists for the public repository, repository 
 ## Deployment responsibilities
 
 The merchant is responsible for WordPress/host security, HTTPS, access control, backups, protecting OAuth credentials, keeping dependencies supported, and validating the exact bunq/SureCart/WooCommerce account configuration before production use.
+
+## Repository credential scanning
+
+CI runs `tools/secret_scan.py` against both the current working tree and fetched Git history. The scanner reports only file/line/detector metadata and intentionally does not echo matched credential material into logs.
+
+A passing scan means no configured detector matched; it is not proof that arbitrary secrets cannot exist. Maintainers should also enable GitHub Private Vulnerability Reporting and, where available, GitHub secret scanning/push protection.

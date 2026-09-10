@@ -122,6 +122,10 @@ See [`docs/SETUP-BUNQ.md`](docs/SETUP-BUNQ.md).
 
 For a production site: **sandbox first**. Do not switch to live merely because OAuth connects.
 
+### Release status
+
+The source version is `3.0.0`, but a `v3.0.0` GitHub Release is intentionally gated. A tag may publish only after the matching non-secret acceptance receipt exists and the release workflow passes version, runtime-evidence, security, smoke and package-integrity gates. See [`docs/GITHUB-PUBLISHING.md`](docs/GITHUB-PUBLISHING.md).
+
 ## Security model
 
 See [`SECURITY.md`](SECURITY.md) and [`docs/SECURITY.md`](docs/SECURITY.md).

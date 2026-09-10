@@ -1,18 +1,94 @@
-name: Build release zip
+name: Build and publish release
+
 on:
   workflow_dispatch:
   push:
     tags: ['v*']
+
 permissions:
   contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build
+        with:
+          fetch-depth: 0
+
+      - name: Validate release acceptance receipt
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: python3 tools/validate_release.py "${{ github.ref_name }}"
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      - name: PHP syntax
+        run: find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
+
+      - name: Smoke
+        run: php tests/smoke.php
+
+      - name: Source manifest
+        run: sha256sum -c SOURCE_MANIFEST.sha256
+
+      - name: Secret scanner self-test
+        run: python3 tools/secret_scan.py --self-test
+
+      - name: Secret scan - current tree
+        run: python3 tools/secret_scan.py --tree .
+
+      - name: Secret scan - git history
+        shell: bash
+        run: |
+          set -o pipefail
+          git log --all --full-history -p --no-ext-diff --no-renames | \
+            python3 tools/secret_scan.py --stdin --label git-history
+
+      - name: Build install ZIP
         run: bash tools/build.sh
+
+      - name: Verify package integrity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s dist/open-bunq-payments.zip
+          test -s dist/open-bunq-payments.zip.sha256
+          grep -Eq '^[0-9a-f]{64}  open-bunq-payments\.zip$' dist/open-bunq-payments.zip.sha256
+          (cd dist && sha256sum -c open-bunq-payments.zip.sha256)
+          unzip -t dist/open-bunq-payments.zip
+
       - uses: actions/upload-artifact@v4
         with:
           name: open-bunq-payments
-          path: dist/*.zip
+          path: |
+            dist/open-bunq-payments.zip
+            dist/open-bunq-payments.zip.sha256
+          if-no-files-found: error
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: open-bunq-payments
+          path: dist
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create "$RELEASE_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            dist/open-bunq-payments.zip \
+            dist/open-bunq-payments.zip.sha256 \
+            --verify-tag \
+            --title "Open bunq Payments ${RELEASE_TAG}" \
+            --generate-notes

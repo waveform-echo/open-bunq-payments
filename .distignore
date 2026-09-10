@@ -1,3 +1,4 @@
+.git
 .github
 .gitignore
 .gitattributes
@@ -7,3 +8,4 @@ phpcs.xml.dist
 tests
 tools
 SOURCE_MANIFEST.sha256
+release-receipts

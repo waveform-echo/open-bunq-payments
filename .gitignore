@@ -1,6 +1,9 @@
 /vendor/
+/dist/
 .DS_Store
 *.log
 *.zip
 .env
 .env.*
+__pycache__/
+*.py[cod]
